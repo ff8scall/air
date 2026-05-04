@@ -1,4 +1,6 @@
 import type { MapMarkerData } from "@/types/station";
+import type { CurrentWeather } from "@/lib/weather";
+import { isRaining, isSnowing, getWeatherLabel, getWeatherIcon } from "@/lib/weather";
 
 export interface VentilationAdvice {
   action: "open" | "brief" | "wait" | "close";
@@ -116,6 +118,79 @@ export function getLaundryAdvice(pm10: number, pm25: number): string {
   if (pm10 <= 80 && pm25 <= 35) return "빨래 건조 괜찮아요. 오래 두지는 마세요.";
   if (pm10 <= 150 && pm25 <= 75) return "빨래는 실내에서 건조하세요.";
   return "빨래는 반드시 실내에서 건조하세요.";
+}
+
+export interface WeatherAdvice {
+  weatherLabel: string;
+  weatherIcon: string;
+  temperature: number;
+  humidity: number;
+  windspeed: number;
+  ventilationNote: string | null;
+  laundryNote: string | null;
+  outdoorNote: string | null;
+  summary: string;
+}
+
+export function getWeatherAdvice(pm10: number, pm25: number, w: CurrentWeather): WeatherAdvice {
+  const raining = isRaining(w.weathercode);
+  const snowing = isSnowing(w.weathercode);
+  const strongWind = w.windspeed >= 30;
+  const highHumidity = w.humidity >= 80;
+  const hotDay = w.temperature >= 33;
+  const coldDay = w.temperature <= 0;
+
+  let ventilationNote: string | null = null;
+  let laundryNote: string | null = null;
+  let outdoorNote: string | null = null;
+
+  if (raining || snowing) {
+    ventilationNote = raining ? "비가 내려 창문을 닫는 것이 좋아요." : "눈이 내려요. 창문을 닫아두세요.";
+    laundryNote = "야외 건조 불가 — 실내에서 말리세요.";
+    outdoorNote = raining ? "우산을 챙기세요." : "미끄럼에 주의하세요.";
+  } else if (strongWind) {
+    ventilationNote = `바람이 강해요(${w.windspeed}km/h). 짧은 환기를 추천해요.`;
+    laundryNote = "바람에 빨래가 날릴 수 있어요. 고정해두세요.";
+    outdoorNote = "강풍 주의 — 모자를 날릴 수 있어요.";
+  } else if (hotDay) {
+    ventilationNote = `기온이 ${w.temperature}°C로 높아요. 이른 아침에 환기하세요.`;
+    laundryNote = "뜨거운 햇볕에 빨래가 빠르게 말라요.";
+    outdoorNote = "자외선 차단제를 꼭 바르세요.";
+  } else if (coldDay) {
+    ventilationNote = `기온이 ${w.temperature}°C로 낮아요. 5분 이내 짧게 환기하세요.`;
+    laundryNote = highHumidity ? "습도가 높아 야외 건조가 느려요." : "야외 건조 가능하지만 오래 걸릴 수 있어요.";
+    outdoorNote = "방한 용품을 챙기세요.";
+  } else if (highHumidity) {
+    laundryNote = `습도 ${w.humidity}% — 야외 건조보다 실내 건조를 추천해요.`;
+  }
+
+  const pmBad = pm10 > 80 || pm25 > 35;
+  const pmGood = pm10 <= 30 && pm25 <= 15;
+
+  let summary = "";
+  if (pmBad && (raining || snowing)) {
+    summary = "미세먼지도 나쁘고 날씨도 나쁜 날이에요. 외출 시 마스크를 꼭 챙기세요.";
+  } else if (pmGood && !raining && !snowing && !strongWind && !hotDay && !coldDay) {
+    summary = "공기도 맑고 날씨도 좋아요! 환기와 야외 활동에 완벽한 날이에요.";
+  } else if (pmBad) {
+    summary = "미세먼지가 나쁜 날이에요. 환기를 줄이고 외출 시 마스크를 착용하세요.";
+  } else if (raining) {
+    summary = "비 오는 날이에요. 창문을 닫고 실내 활동을 권장해요.";
+  } else {
+    summary = `기온 ${w.temperature}°C, ${getWeatherLabel(w.weathercode)} — 평범한 하루예요.`;
+  }
+
+  return {
+    weatherLabel: getWeatherLabel(w.weathercode),
+    weatherIcon: getWeatherIcon(w.weathercode),
+    temperature: w.temperature,
+    humidity: w.humidity,
+    windspeed: w.windspeed,
+    ventilationNote,
+    laundryNote,
+    outdoorNote,
+    summary,
+  };
 }
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {

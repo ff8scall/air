@@ -5,12 +5,15 @@ import type { UserStation } from "@/hooks/useUserStation";
 import type { AirQualityItem } from "@/types/air-quality";
 import type { MapMarkerData } from "@/types/station";
 import { calcVentilationScore, calcLaundryScore, parseValue } from "@/lib/scoring";
-import { getVentilationAdvice, getLaundryAdvice, getNeighborhoodInsight } from "@/lib/advisor";
+import { getVentilationAdvice, getLaundryAdvice, getNeighborhoodInsight, getWeatherAdvice } from "@/lib/advisor";
+import type { WeatherAdvice } from "@/lib/advisor";
+import type { CurrentWeather } from "@/lib/weather";
 import { buildMapMarkers, getStationCoords } from "@/lib/station-mapping";
 import HeroStatusCard from "@/components/HeroStatusCard";
 import ActionAdviceCard from "@/components/ActionAdviceCard";
 import ScoreCards from "@/components/ScoreCards";
 import NeighborhoodCompareCard from "@/components/NeighborhoodCompareCard";
+import WeatherAdviceCard from "@/components/WeatherAdviceCard";
 import StationSearchBar from "@/components/StationSearchBar";
 import DynamicMap from "@/components/DynamicMap";
 import DynamicNotification from "@/components/DynamicNotification";
@@ -36,6 +39,17 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
   const [markers] = useState<MapMarkerData[]>(initialMarkers);
   const [error, setError] = useState<string | null>(initialError);
   const [fetching, setFetching] = useState(false);
+  const [weather, setWeather] = useState<CurrentWeather | null>(null);
+
+  const fetchWeather = useCallback(async (lat: number, lng: number) => {
+    try {
+      const res = await fetch(`/api/weather?lat=${lat}&lng=${lng}`);
+      const json = await res.json();
+      if (res.ok) setWeather(json.data ?? null);
+    } catch {
+      // 날씨 오류는 조용히 무시 (보조 정보)
+    }
+  }, []);
 
   const fetchStation = useCallback(async (s: UserStation) => {
     setFetching(true);
@@ -75,6 +89,14 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
   const stationCoords = getStationCoords(station.stationName);
   const mapCenter: [number, number] = stationCoords ?? DEFAULT_CENTER;
   const [centerLat, centerLng] = mapCenter;
+
+  useEffect(() => {
+    fetchWeather(centerLat, centerLng);
+  }, [centerLat, centerLng, fetchWeather]);
+
+  const weatherAdvice: WeatherAdvice | null = weather
+    ? getWeatherAdvice(pm10Safe, pm25Safe, weather)
+    : null;
 
   const neighborhood = getNeighborhoodInsight(station.stationName, centerLat, centerLng, markers);
 
@@ -133,6 +155,13 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
             <section aria-label="환기 및 건조 지수">
               <ScoreCards ventilation={ventilation} laundry={laundry} />
             </section>
+
+            {/* 날씨 추천 */}
+            {weatherAdvice && (
+              <section aria-label="오늘의 날씨와 생활 추천">
+                <WeatherAdviceCard advice={weatherAdvice} />
+              </section>
+            )}
 
             {/* 동네 비교 */}
             <section aria-label="주변 동네 공기질 비교">
