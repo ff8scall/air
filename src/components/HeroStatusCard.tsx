@@ -102,10 +102,12 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
             </div>
             {/* 날씨 pill */}
             {weather && (
-              <div className="shrink-0 flex flex-col items-end gap-1">
-                <span className="text-2xl leading-none">{getWeatherIcon(weather.weathercode)}</span>
-                <span className="text-white font-black text-lg leading-none">{weather.temperature}°</span>
-                <span className="text-white/60 text-xs leading-none">습도 {weather.humidity}%</span>
+              <div className="shrink-0 flex items-center gap-2 bg-white/15 rounded-2xl px-3 py-2">
+                <span className="text-xl leading-none">{getWeatherIcon(weather.weathercode)}</span>
+                <div className="flex flex-col items-start">
+                  <span className="text-white font-black text-base leading-tight">{weather.temperature}°C</span>
+                  <span className="text-white/60 text-xs leading-tight">습도 {weather.humidity}%</span>
+                </div>
               </div>
             )}
           </div>
