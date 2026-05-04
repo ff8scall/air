@@ -1,0 +1,26 @@
+{
+  "name": "환기 미세먼지 대시보드",
+  "short_name": "환기지수",
+  "description": "전국 실시간 미세먼지 현황, 환기 지수, 빨래 건조 지수",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "weather"],
+  "lang": "ko"
+}
