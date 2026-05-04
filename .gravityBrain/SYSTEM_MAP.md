@@ -1,6 +1,6 @@
 # SYSTEM MAP — 환기 미세먼지 대시보드
 
-> 마지막 갱신: 2026-05-04 (3차)
+> 마지막 갱신: 2026-05-04 (4차)
 
 ## 프로젝트 루트
 ```
@@ -14,7 +14,8 @@ c:\AI\Antigravity\Air\
 │   │       ├── air-quality/route.ts  # GET /api/air-quality?station=
 │   │       ├── sido/route.ts         # GET /api/sido?sido=
 │   │       ├── nearby/route.ts       # GET /api/nearby
-│   │       └── resolve-station/route.ts # GET ?umdName= 또는 ?lat=&lng= → { stationName, regionName }
+│   │       ├── resolve-station/route.ts # GET ?umdName= 또는 ?lat=&lng= → { stationName, regionName }
+│   │       └── weather/route.ts         # GET ?lat=&lng= → Open-Meteo 현재 날씨
 │   ├── components/
 │   │   ├── DashboardShell.tsx        # [Client] 지역 상태 관리 + 전체 레이아웃 렌더링
 │   │   ├── HeroStatusCard.tsx        # 등급별 그라데이션 Hero + 인라인 검색바 하단 배치
@@ -28,16 +29,17 @@ c:\AI\Antigravity\Air\
 │   │   ├── DynamicMap.tsx            # AirQualityMap ssr:false wrapper
 │   │   ├── DynamicNotification.tsx   # NotificationSetup ssr:false wrapper
 │   │   ├── NotificationSetup.tsx     # 알림 권한 요청 버튼
-│   │   ├── SeoJsonLd.tsx             # JSON-LD 구조화 데이터
+│   │   ├── WeatherAdviceCard.tsx     # [NEW] 날씨 요약 + 환기/빨래/외출 보정 노트
 │   │   └── icons.tsx                 # 전용 SVG 아이콘 + gradeMarkerSvg()
 │   ├── hooks/
 │   │   └── useUserStation.ts         # [Client] localStorage 기반 선택 측정소 관리
 │   ├── lib/
-│   │   ├── airkorea.ts               # 에어코리아 API 클라이언트 (revalidate 1800)
+│   │   ├── airkorea.ts               # 에어코리아 API 클라이언트 + fetchAllSidoRealtime()
 │   │   ├── scoring.ts                # 환기/빨래 점수 계산 + getGradeInfo()
-│   │   ├── advisor.ts                # 행동 추천 로직 (VentilationAdvice, NeighborhoodInsight)
-│   │   ├── station-mapping.ts        # buildMapMarkers() — STATION_COORDS_API 1순위
-│   │   └── station-coords-api.ts     # [NEW] 에어코리아 getMsrstnList 기반 전국 672개 측정소 좌표
+│   │   ├── advisor.ts                # VentilationAdvice(factors[]), WeatherAdvice, getWeatherAdvice()
+│   │   ├── weather.ts                # [NEW] Open-Meteo fetch + WMO 코드 변환
+│   │   ├── station-mapping.ts        # buildMapMarkers() + getStationCoords()
+│   │   └── station-coords-api.ts     # 에어코리아 getMsrstnList 기반 전국 672개 측정소 좌표
 │   └── types/
 │       ├── air-quality.ts
 │       └── station.ts
@@ -56,10 +58,11 @@ Header (sticky, z-50)
 
 Main (max-w-6xl, grid lg:2열)
   ├─ 좌측 패널 (420px fixed)
-  │   ├─ HeroStatusCard
-  │   │   └─ [하단] StationSearchBar (항상 노출 — 검색창 + GPS + 초기화)
-  │   ├─ ActionAdviceCard
+  │   ├─ HeroStatusCard (날씨 pill: 기온/이모지/습도 우측)
+  │   │   └─ [하단] StationSearchBar (검색창 + GPS + 초기화 + 성공 토스트)
+  │   ├─ ActionAdviceCard (환기추천 + 근거칩 + 빨래조언)
   │   ├─ ScoreCards
+  │   ├─ WeatherAdviceCard (날씨 요약 + 환기/빨래/외출 보정)
   │   ├─ NeighborhoodCompareCard
   │   └─ 등급 기준표
   └─ 우측 패널 (sticky top-[56px])
@@ -74,7 +77,7 @@ Footer
 [서버 초기 렌더]
   page.tsx (Server Component)
     ├─ fetchStationRealtime(DEFAULT_STATION) → initialLatest
-    └─ fetchSidoRealtime + buildMapMarkers() → initialMarkers
+    └─ fetchAllSidoRealtime() (17개 시도 병렬) + buildMapMarkers() → initialMarkers
           ↓ props
   DashboardShell (Client Component)
 
@@ -86,6 +89,8 @@ Footer
   useUserStation → localStorage 저장
           ↓ station 변경 감지
   DashboardShell → GET /api/air-quality?station= → 리렌더
+          ↓ mapCenter 변경 감지
+  DashboardShell → GET /api/weather?lat=&lng= → weather state → WeatherAdviceCard
 
 [좌표 조회 우선순위]
   station-mapping.ts::buildMapMarkers()

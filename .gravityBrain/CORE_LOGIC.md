@@ -1,6 +1,6 @@
 # CORE LOGIC — 환기 미세먼지 대시보드
 
-> 마지막 갱신: 2026-05-04
+> 마지막 갱신: 2026-05-04 (4차)
 
 ## 1. API 캐싱 전략
 
@@ -136,3 +136,41 @@ calcLaundryScore(pm10, pm25): 동일 공식
   - GPS 버튼: `w-9 h-9` 아이콘 버튼
   - 초기화(✕): `onClear()` → `useUserStation.clearStation()`
 - 에러: Hero 카드 안 `bg-black/20` 반투명 텍스트로 표시
+- **성공 토스트**: 3초 `bg-white/20` 응답 카드 (`✓ 송파구 · 송파구 측정소로 변경됩니다`)
+
+## 14. 날씨 접목 로직 (2026-05-04)
+
+### lib/weather.ts
+- `fetchCurrentWeather(lat, lng)` → Open-Meteo 무키 API 호출
+- 반환: `{ temperature, humidity, windspeed, weathercode, precipitation }`
+- WMO 코드 → 한글 라벨(`getWeatherLabel`) / 이모지(`getWeatherIcon`) 맵핑
+- 강수(`isRaining`), 눈(`isSnowing`) 빬 픲릭한
+
+### lib/advisor.ts::getWeatherAdvice(pm10, pm25, weather)
+
+| 조건 | ventilationNote | laundryNote | outdoorNote |
+|---|---|---|---|
+| 비/눈 | 완창한 권고 | 실내 건조 | 우산/미끄러주의 |
+| 강풍(≥30km/h) | 짧은 환기 | 빨래 고정 | 강풍 주의 |
+| 폭염(≥33°C) | 이른 아침 환기 | 빠른 건조 | 자외선 차단제 |
+| 한파(≤0°C) | 5분 이내 권고 | 실내 건조 | 방한 용품 |
+| 고습도(≥80%) | null | 실내 건조 권식 | null |
+
+- `summary`: PM + 날씨 교차 조합으로 5가지 종합 문구
+
+### WeatherAdviceCard UI 구성
+- 날씨 이모지 + 라벨 + summary 요약 바
+- 기온/습도/풍속 칩 3개
+- ventilationNote / laundryNote / outdoorNote NoteRow (아이콘 + 라벨 + 텍스트)
+
+## 15. fetchAllSidoRealtime (2026-05-04)
+
+- **문제**: `fetchSidoRealtime("전국")` → 에어코리아 `numOfRows=500` 한계에 곯튀램 경기도 5개만 포함 (126개 누락)
+- **해결**: 17개 시도 `Promise.allSettled` 병렬 호출 후 `flatMap` 합산
+- **특징**: 일부 시도 호출 실패해도 `allSettled`로 나머지 정상 노출
+- **사용 위치**: `page.tsx` 서버 컴포넌트 (ISR revalidate 1800)
+
+## 16. SeoJsonLd hydration 오류 (2026-05-04)
+
+- **원인**: `SeoJsonLd` Server Component이 `<head>` 내 `<script dangerouslySetInnerHTML>`을 돌려줌 → `ThemeProvider` 클라이언트 hydration 시 `type=null` / `__html=""` 불일치
+- **해결**: `SeoJsonLd.tsx` 컴포넌트 제거, `layout.tsx`의 `RootLayout` 함수 `<head>` 내 정적 `<script>` 직접 인라인
