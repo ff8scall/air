@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
-import SeoJsonLd from "@/components/SeoJsonLd";
 import ThemeProvider from "@/components/ThemeProvider";
 
 const notoSansKr = Noto_Sans_KR({
@@ -53,7 +52,18 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        <SeoJsonLd />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "환기 미세먼지 대시보드",
+            description: "전국 실시간 미세먼지(PM10, PM2.5) 현황 지도와 환기 지수, 빨래 건조 지수를 제공하는 대기질 모니터링 앱",
+            applicationCategory: "HealthApplication",
+            operatingSystem: "All",
+            url: APP_URL,
+          }) }}
+        />
         <meta name="theme-color" content="#3B82F6" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
