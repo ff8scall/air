@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import SeoJsonLd from "@/components/SeoJsonLd";
+import ThemeProvider from "@/components/ThemeProvider";
 
 const notoSansKr = Noto_Sans_KR({
   variable: "--font-noto-sans-kr",
@@ -56,8 +57,8 @@ export default function RootLayout({
         <meta name="theme-color" content="#3B82F6" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className={`${notoSansKr.variable} font-sans antialiased bg-gray-50 min-h-screen`}>
-        {children}
+      <body className={`${notoSansKr.variable} font-sans antialiased bg-gray-50 dark:bg-gray-950 min-h-screen`}>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

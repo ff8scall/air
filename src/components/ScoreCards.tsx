@@ -9,10 +9,10 @@ interface Props {
 }
 
 function scoreColor(score: number) {
-  if (score >= 75) return { hex: "#0EA5E9", bg: "bg-sky-50", ring: "bg-sky-500" };
-  if (score >= 50) return { hex: "#22C55E", bg: "bg-green-50", ring: "bg-green-500" };
-  if (score >= 25) return { hex: "#F97316", bg: "bg-orange-50", ring: "bg-orange-500" };
-  return { hex: "#EF4444", bg: "bg-red-50", ring: "bg-red-500" };
+  if (score >= 75) return { hex: "#0EA5E9", bg: "bg-sky-50 dark:bg-sky-950", ring: "bg-sky-500" };
+  if (score >= 50) return { hex: "#22C55E", bg: "bg-green-50 dark:bg-green-950", ring: "bg-green-500" };
+  if (score >= 25) return { hex: "#F97316", bg: "bg-orange-50 dark:bg-orange-950", ring: "bg-orange-500" };
+  return { hex: "#EF4444", bg: "bg-red-50 dark:bg-red-950", ring: "bg-red-500" };
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -22,7 +22,7 @@ function ScoreRing({ score }: { score: number }) {
   const offset = circ - (score / 100) * circ;
   return (
     <svg width="80" height="80" className="rotate-[-90deg]">
-      <circle cx="40" cy="40" r={r} fill="none" stroke="#e2e8f0" strokeWidth="8" />
+      <circle cx="40" cy="40" r={r} fill="none" stroke="currentColor" className="text-gray-200 dark:text-gray-700" strokeWidth="8" />
       <circle
         cx="40" cy="40" r={r} fill="none"
         stroke={hex} strokeWidth="8"
@@ -46,16 +46,16 @@ function ScoreCard({
       <div className="flex items-center justify-between">
         <div>
           <span>{icon}</span>
-          <h3 className="text-xs font-semibold text-gray-500 mt-0.5">{title}</h3>
+          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5">{title}</h3>
         </div>
         <div className="relative flex items-center justify-center">
           <ScoreRing score={score} />
-          <span className="absolute text-lg font-black text-gray-800">{score}</span>
+          <span className="absolute text-lg font-black text-gray-800 dark:text-gray-100">{score}</span>
         </div>
       </div>
       <div>
-        <p className="font-bold text-base text-gray-800">{label}</p>
-        <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{description}</p>
+        <p className="font-bold text-base text-gray-800 dark:text-gray-100">{label}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{description}</p>
       </div>
     </article>
   );

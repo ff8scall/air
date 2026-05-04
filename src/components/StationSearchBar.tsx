@@ -121,9 +121,9 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
 
       {/* 드롭다운 패널 */}
       {open && (
-        <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 z-[2000]">
+        <div className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-4 z-[2000]">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-bold text-gray-700">지역 변경</p>
+            <p className="text-sm font-bold text-gray-700 dark:text-gray-200">지역 변경</p>
             <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
               <IconX className="w-4 h-4" />
             </button>
@@ -139,7 +139,7 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="동 이름 입력 (예: 오금동)"
-              className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="flex-1 text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
               autoFocus
             />
             <button
@@ -171,13 +171,13 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
 
           {/* 에러 */}
           {error && (
-            <p className="mt-2 text-xs text-red-500 bg-red-50 rounded-xl px-3 py-2">{error}</p>
+            <p className="mt-2 text-xs text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950 rounded-xl px-3 py-2">{error}</p>
           )}
 
           {/* 초기화 */}
           <button
             onClick={() => { onClear(); setOpen(false); }}
-            className="mt-2 w-full text-xs text-gray-400 hover:text-gray-600 py-1"
+            className="mt-2 w-full text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 py-1"
           >
             기본 지역으로 초기화
           </button>

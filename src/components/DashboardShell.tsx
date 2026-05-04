@@ -15,6 +15,7 @@ import StationSearchBar from "@/components/StationSearchBar";
 import DynamicMap from "@/components/DynamicMap";
 import DynamicNotification from "@/components/DynamicNotification";
 import { IconWind } from "@/components/icons";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const GRADE_ITEMS = [
   { grade: "좋음",     pm10: "0–30",   pm25: "0–15",  dot: "#0EA5E9" },
@@ -72,19 +73,20 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
   const neighborhood = getNeighborhoodInsight(station.stationName, 37.502, 127.124, markers);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-950">
       {/* 헤더 */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <IconWind className="w-5 h-5 text-blue-500" />
-            <span className="font-black text-base text-gray-800 tracking-tight">환기 미세먼지</span>
+            <span className="font-black text-base text-gray-800 dark:text-gray-100 tracking-tight">환기 미세먼지</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-400 hidden sm:block">30분마다 갱신</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:block">30분마다 갱신</span>
             {fetching && (
               <span className="w-3.5 h-3.5 border-2 border-blue-300 border-t-blue-500 rounded-full animate-spin" />
             )}
+            <ThemeToggle />
             <DynamicNotification station={station.stationName} />
           </div>
         </div>
@@ -92,7 +94,7 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
 
       <main className="max-w-6xl mx-auto px-4 py-5">
         {error && (
-          <div role="alert" className="mb-4 bg-red-50 border border-red-200 text-red-600 rounded-2xl px-4 py-3 text-sm">
+          <div role="alert" className="mb-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-2xl px-4 py-3 text-sm">
             ⚠️ {error}
           </div>
         )}
@@ -132,8 +134,8 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
             </section>
 
             {/* 등급 기준표 */}
-            <section aria-labelledby="guide-title" className="bg-white rounded-3xl p-5 shadow-sm">
-              <h2 id="guide-title" className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+            <section aria-labelledby="guide-title" className="bg-white dark:bg-gray-900 rounded-3xl p-5 shadow-sm">
+              <h2 id="guide-title" className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
                 미세먼지 등급 기준
               </h2>
               <div className="space-y-2">
@@ -141,11 +143,11 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
                   <div key={item.grade} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: item.dot }} />
-                      <span className="font-semibold text-gray-700">{item.grade}</span>
+                      <span className="font-semibold text-gray-700 dark:text-gray-300">{item.grade}</span>
                     </div>
-                    <div className="text-right text-xs text-gray-400">
+                    <div className="text-right text-xs text-gray-400 dark:text-gray-500">
                       <span>PM10 {item.pm10}</span>
-                      <span className="mx-1.5 text-gray-200">|</span>
+                      <span className="mx-1.5 text-gray-200 dark:text-gray-700">|</span>
                       <span>PM2.5 {item.pm25} ㎍/㎥</span>
                     </div>
                   </div>
@@ -160,10 +162,10 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
             className="lg:sticky lg:top-[56px] lg:h-[calc(100vh-56px)]"
           >
             <div className="mb-2 flex items-center justify-between px-1">
-              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+              <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 전국 미세먼지 현황
               </h2>
-              <span className="text-xs text-gray-300">마커 클릭 시 상세 정보</span>
+              <span className="text-xs text-gray-300 dark:text-gray-600">마커 클릭 시 상세 정보</span>
             </div>
             <div className="h-[400px] lg:h-[calc(100vh-84px)]">
               <DynamicMap markers={markers} center={[37.502, 127.124]} zoom={13} />
@@ -172,7 +174,7 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
         </div>
       </main>
 
-      <footer className="mt-8 border-t border-gray-100 py-5 text-center text-xs text-gray-300">
+      <footer className="mt-8 border-t border-gray-100 dark:border-gray-800 py-5 text-center text-xs text-gray-300 dark:text-gray-600">
         <p>데이터: 환경부 / 한국환경공단 에어코리아 · 측정소 기준 인근 대표값 · 30분 캐시</p>
         <p className="mt-1">© {new Date().getFullYear()} Antigravity. 참고용 자료로만 활용하세요.</p>
       </footer>

@@ -53,16 +53,16 @@ export default function ActionAdviceCard({ advice, laundryAdvice }: Props) {
               {badge.label}
             </span>
           </div>
-          <h2 className="text-lg font-black text-gray-800 leading-tight">{advice.headline}</h2>
-          <p className="text-sm text-gray-500 mt-1 leading-relaxed">{advice.subtext}</p>
+          <h2 className="text-lg font-black text-gray-800 dark:text-gray-100 leading-tight">{advice.headline}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{advice.subtext}</p>
         </div>
       </div>
 
       {/* 환기 시간 표시 */}
       {advice.minutes && (
         <div className="mt-4 flex items-center gap-3">
-          <div className="flex-1 bg-white/70 rounded-2xl px-4 py-3 flex items-center justify-between">
-            <span className="text-xs text-gray-500 font-medium">권장 환기 시간</span>
+          <div className="flex-1 bg-white/70 dark:bg-white/10 rounded-2xl px-4 py-3 flex items-center justify-between">
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">권장 환기 시간</span>
             <span className={`text-2xl font-black ${iconColor}`}>
               {advice.minutes}<span className="text-sm font-semibold ml-0.5">분</span>
             </span>
@@ -71,9 +71,9 @@ export default function ActionAdviceCard({ advice, laundryAdvice }: Props) {
       )}
 
       {/* 빨래 조언 */}
-      <div className="mt-3 bg-white/60 rounded-2xl px-4 py-2.5 flex items-center gap-2">
-        <span className="text-sm text-gray-400">🧺</span>
-        <p className="text-xs text-gray-600 font-medium">{laundryAdvice}</p>
+      <div className="mt-3 bg-white/60 dark:bg-white/10 rounded-2xl px-4 py-2.5 flex items-center gap-2">
+        <span className="text-sm text-gray-400">�</span>
+        <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">{laundryAdvice}</p>
       </div>
     </div>
   );
