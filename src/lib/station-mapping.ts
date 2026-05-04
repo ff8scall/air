@@ -1,5 +1,6 @@
 import type { SidoAirItem } from "@/types/air-quality";
 import type { MapMarkerData } from "@/types/station";
+import { STATION_COORDS_API } from "@/lib/station-coords-api";
 
 const SIDO_CENTERS: Record<string, [number, number]> = {
   서울: [37.5665, 126.978],
@@ -197,25 +198,18 @@ const STATION_COORDS: Record<string, [number, number]> = {
   양평: [37.4919, 127.4874],
 };
 
-function guessCoordsFromSido(sidoName: string): [number, number] | null {
-  for (const [key, coords] of Object.entries(SIDO_CENTERS)) {
-    if (sidoName.includes(key)) return coords;
-  }
-  return null;
-}
-
 export function buildMapMarkers(items: SidoAirItem[]): MapMarkerData[] {
   return items
     .map((item) => {
-      const exact = STATION_COORDS[item.stationName];
-      const fallback = guessCoordsFromSido(item.sidoName);
-      const coords = exact || fallback;
+      const coords =
+        STATION_COORDS_API[item.stationName] ??
+        STATION_COORDS[item.stationName];
       if (!coords) return null;
 
       return {
         stationName: item.stationName,
-        lat: coords[0] + (exact ? 0 : (Math.random() - 0.5) * 0.8),
-        lng: coords[1] + (exact ? 0 : (Math.random() - 0.5) * 0.8),
+        lat: coords[0],
+        lng: coords[1],
         pm10Value: item.pm10Value,
         pm25Value: item.pm25Value,
         khaiGrade: item.khaiGrade,
