@@ -48,6 +48,18 @@ export async function fetchSidoRealtime(sidoName = "전국"): Promise<SidoAirIte
   return fetchJson<SidoAirItem[]>(url);
 }
 
+const ALL_SIDO = [
+  "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
+  "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주",
+];
+
+export async function fetchAllSidoRealtime(): Promise<SidoAirItem[]> {
+  const results = await Promise.allSettled(
+    ALL_SIDO.map((sido) => fetchSidoRealtime(sido))
+  );
+  return results.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
+}
+
 export async function fetchTmCoord(umdName: string): Promise<TmCoordItem[]> {
   const url =
     `${BASE}/MsrstnInfoInqireSvc/getTMStdrCrdnt` +

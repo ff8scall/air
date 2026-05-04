@@ -1,4 +1,4 @@
-import { fetchStationRealtime, fetchSidoRealtime } from "@/lib/airkorea";
+import { fetchStationRealtime, fetchAllSidoRealtime } from "@/lib/airkorea";
 import { buildMapMarkers } from "@/lib/station-mapping";
 import DashboardShell from "@/components/DashboardShell";
 
@@ -14,7 +14,7 @@ export default async function HomePage() {
   try {
     const [stationItems, sidoItems] = await Promise.all([
       fetchStationRealtime(DEFAULT_STATION, "DAILY"),
-      fetchSidoRealtime("전국"),
+      fetchAllSidoRealtime(),
     ]);
     latest = Array.isArray(stationItems) ? stationItems[0] ?? null : null;
     markers = buildMapMarkers(Array.isArray(sidoItems) ? sidoItems : []);
