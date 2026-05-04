@@ -40,7 +40,6 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
   const [loading, setLoading] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
 
   async function search(umdName: string) {
     if (!umdName.trim()) return;
@@ -49,16 +48,8 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
     try {
       const res = await fetch(`/api/resolve-station?umdName=${encodeURIComponent(umdName.trim())}`);
       const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "검색 실패");
-        return;
-      }
-      onStation({
-        stationName: data.stationName,
-        regionName: data.regionName,
-        updatedAt: Date.now(),
-      });
-      setOpen(false);
+      if (!res.ok) { setError(data.error ?? "검색 실패"); return; }
+      onStation({ stationName: data.stationName, regionName: data.regionName, updatedAt: Date.now() });
       setQuery("");
     } catch {
       setError("네트워크 오류가 발생했습니다.");
@@ -68,30 +59,17 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
   }
 
   async function handleGps() {
-    if (!navigator.geolocation) {
-      setError("이 브라우저는 위치 서비스를 지원하지 않습니다.");
-      return;
-    }
+    if (!navigator.geolocation) { setError("위치 서비스를 지원하지 않는 브라우저입니다."); return; }
     setGpsLoading(true);
     setError(null);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
           const { latitude, longitude } = pos.coords;
-          const res = await fetch(
-            `/api/resolve-station?lat=${latitude}&lng=${longitude}`
-          );
+          const res = await fetch(`/api/resolve-station?lat=${latitude}&lng=${longitude}`);
           const data = await res.json();
-          if (!res.ok) {
-            setError(data.error ?? "위치 기반 측정소를 찾지 못했습니다.");
-            return;
-          }
-          onStation({
-            stationName: data.stationName,
-            regionName: data.regionName,
-            updatedAt: Date.now(),
-          });
-          setOpen(false);
+          if (!res.ok) { setError(data.error ?? "위치 기반 측정소를 찾지 못했습니다."); return; }
+          onStation({ stationName: data.stationName, regionName: data.regionName, updatedAt: Date.now() });
         } catch {
           setError("위치 정보 처리 중 오류가 발생했습니다.");
         } finally {
@@ -100,7 +78,7 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
       },
       (err) => {
         setGpsLoading(false);
-        if (err.code === 1) setError("위치 권한이 거부되었습니다. 직접 검색해주세요.");
+        if (err.code === 1) setError("위치 권한이 거부되었습니다.");
         else setError("위치를 가져올 수 없습니다.");
       },
       { timeout: 8000 }
@@ -108,80 +86,60 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
   }
 
   return (
-    <div className="relative">
-      {/* 현재 지역 표시 버튼 */}
-      <button
-        onClick={() => { setOpen((v) => !v); setError(null); }}
-        className="flex items-center gap-1.5 text-white/80 hover:text-white transition-colors text-sm font-medium"
+    <div className="w-full">
+      {/* 현재 지역 표시 */}
+      <div className="flex items-center gap-1.5 mb-2">
+        <IconMapPin className="w-3.5 h-3.5 text-white/60 shrink-0" />
+        <span className="text-white/80 text-sm font-medium truncate">{currentRegionName}</span>
+      </div>
+
+      {/* 인라인 검색바 */}
+      <form
+        onSubmit={(e) => { e.preventDefault(); search(query); }}
+        className="flex items-center gap-1.5"
       >
-        <IconMapPin className="w-3.5 h-3.5" />
-        <span className="max-w-[120px] truncate">{currentRegionName}</span>
-        <svg className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-      </button>
-
-      {/* 드롭다운 패널 */}
-      {open && (
-        <div className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-4 z-[2000]">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-bold text-gray-700 dark:text-gray-200">지역 변경</p>
-            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
-              <IconX className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* 검색창 */}
-          <form
-            onSubmit={(e) => { e.preventDefault(); search(query); }}
-            className="flex gap-2 mb-2"
-          >
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="동 이름 입력 (예: 오금동)"
-              className="flex-1 text-sm border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              autoFocus
-            />
-            <button
-              type="submit"
-              disabled={loading || !query.trim()}
-              className="shrink-0 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 text-white rounded-xl px-3 py-2 transition-colors"
-            >
-              {loading ? (
-                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin block" />
-              ) : (
-                <IconSearch className="w-4 h-4" />
-              )}
-            </button>
-          </form>
-
-          {/* GPS 버튼 */}
-          <button
-            onClick={handleGps}
-            disabled={gpsLoading}
-            className="w-full flex items-center justify-center gap-2 text-sm text-blue-500 hover:text-blue-700 py-2 rounded-xl hover:bg-blue-50 transition-colors disabled:opacity-50"
-          >
-            {gpsLoading ? (
-              <span className="w-4 h-4 border-2 border-blue-300 border-t-blue-500 rounded-full animate-spin" />
-            ) : (
-              <IconLocate className="w-4 h-4" />
-            )}
-            현재 위치 사용
-          </button>
-
-          {/* 에러 */}
-          {error && (
-            <p className="mt-2 text-xs text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-950 rounded-xl px-3 py-2">{error}</p>
+        <div className="flex-1 flex items-center gap-2 bg-white/20 hover:bg-white/25 focus-within:bg-white/30 rounded-xl px-3 py-2 transition-colors">
+          <IconSearch className="w-3.5 h-3.5 text-white/50 shrink-0" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="동 이름으로 검색"
+            className="flex-1 bg-transparent text-sm text-white placeholder:text-white/50 focus:outline-none min-w-0"
+          />
+          {loading && (
+            <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
           )}
-
-          {/* 초기화 */}
-          <button
-            onClick={() => { onClear(); setOpen(false); }}
-            className="mt-2 w-full text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 py-1"
-          >
-            기본 지역으로 초기화
-          </button>
         </div>
+
+        {/* GPS 버튼 */}
+        <button
+          type="button"
+          onClick={handleGps}
+          disabled={gpsLoading}
+          title="현재 위치 사용"
+          className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 transition-colors disabled:opacity-50"
+        >
+          {gpsLoading
+            ? <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            : <IconLocate className="w-4 h-4 text-white/80" />
+          }
+        </button>
+
+        {/* 초기화 버튼 */}
+        <button
+          type="button"
+          onClick={onClear}
+          title="기본 지역으로 초기화"
+          className="shrink-0 w-9 h-9 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 transition-colors"
+        >
+          <IconX className="w-3.5 h-3.5 text-white/70" />
+        </button>
+      </form>
+
+      {/* 에러 */}
+      {error && (
+        <p className="mt-2 text-xs text-white/90 bg-black/20 rounded-lg px-3 py-1.5">{error}</p>
       )}
     </div>
   );

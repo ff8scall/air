@@ -49,17 +49,17 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
   const pm25Val = data?.pm25Value && data.pm25Value !== "-" ? Number(data.pm25Value) : null;
 
   const bgGradient: Record<string, string> = {
-    "좋음": "from-sky-400 to-blue-500",
-    "보통": "from-emerald-400 to-green-500",
-    "나쁨": "from-orange-400 to-amber-500",
-    "매우나쁨": "from-red-500 to-rose-600",
-    "알 수 없음": "from-gray-400 to-slate-500",
+    "좋음":       "from-sky-500 to-blue-600 dark:from-sky-700 dark:to-blue-900",
+    "보통":       "from-emerald-600 to-teal-700 dark:from-emerald-700 dark:to-green-900",
+    "나쁨":       "from-orange-500 to-amber-600 dark:from-orange-700 dark:to-amber-900",
+    "매우나쁨":   "from-red-600 to-rose-700 dark:from-red-800 dark:to-rose-950",
+    "알 수 없음": "from-gray-500 to-slate-600 dark:from-gray-700 dark:to-slate-900",
   };
 
   return (
     <div className={`relative rounded-3xl bg-gradient-to-br ${bgGradient[khaiInfo.label]} text-white overflow-hidden shadow-xl`}>
       {/* 배경 장식 */}
-      <div className="absolute inset-0 opacity-10">
+      <div className="absolute inset-0 opacity-10 dark:opacity-5">
         <div className="absolute -top-10 -right-10 w-56 h-56 bg-white rounded-full" />
         <div className="absolute -bottom-16 -left-10 w-72 h-72 bg-white rounded-full" />
       </div>
@@ -68,9 +68,7 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
         {/* 상단 위치 & 시간 */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            {searchBar ?? (
-              <p className="text-white/70 text-sm font-medium flex items-center gap-1"><IconMapPin className="w-3.5 h-3.5" /> {regionName}</p>
-            )}
+            <p className="text-white/70 text-sm font-medium flex items-center gap-1"><IconMapPin className="w-3.5 h-3.5" /> {regionName}</p>
             <p className="text-white/50 text-xs mt-0.5">{stationName} 측정소 기준 · 인근 대표값</p>
           </div>
           {data?.dataTime && (
@@ -97,8 +95,8 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
         {/* PM 수치 카드 */}
         <div className="grid grid-cols-2 gap-3 mb-5">
           {/* PM10 */}
-          <div className="bg-white/15 backdrop-blur rounded-2xl p-4">
-            <p className="text-white/60 text-xs font-semibold uppercase tracking-wide mb-1">PM10 미세먼지</p>
+          <div className="bg-white/15 dark:bg-white/8 backdrop-blur rounded-2xl p-4">
+            <p className="text-white/60 dark:text-white/50 text-xs font-semibold uppercase tracking-wide mb-1">PM10 미세먼지</p>
             <div className="flex items-baseline gap-1">
               <span className="text-3xl font-black">{pm10Val ?? "—"}</span>
               <span className="text-white/60 text-xs">㎍/㎥</span>
@@ -112,8 +110,8 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
           </div>
 
           {/* PM2.5 */}
-          <div className="bg-white/15 backdrop-blur rounded-2xl p-4">
-            <p className="text-white/60 text-xs font-semibold uppercase tracking-wide mb-1">PM2.5 초미세먼지</p>
+          <div className="bg-white/15 dark:bg-white/8 backdrop-blur rounded-2xl p-4">
+            <p className="text-white/60 dark:text-white/50 text-xs font-semibold uppercase tracking-wide mb-1">PM2.5 초미세먼지</p>
             <div className="flex items-baseline gap-1">
               <span className="text-3xl font-black">{pm25Val ?? "—"}</span>
               <span className="text-white/60 text-xs">㎍/㎥</span>
@@ -131,6 +129,13 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
         {!data && (
           <div className="mt-4 bg-white/10 rounded-xl px-4 py-3 text-sm text-white/70">
             ⚠️ 측정 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.
+          </div>
+        )}
+
+        {/* 지역 검색바 */}
+        {searchBar && (
+          <div className="mt-4 pt-4 border-t border-white/20">
+            {searchBar}
           </div>
         )}
       </div>
