@@ -1,5 +1,6 @@
 "use client";
 import type { AirQualityItem } from "@/types/air-quality";
+import type React from "react";
 import { getGradeInfo } from "@/lib/scoring";
 import { IconWind, IconMask, IconBan, IconMapPin, IconClock } from "@/components/icons";
 
@@ -7,6 +8,7 @@ interface Props {
   data: AirQualityItem | null;
   stationName: string;
   regionName: string;
+  searchBar?: React.ReactNode;
 }
 
 const GRADE_DESC: Record<string, string> = {
@@ -38,7 +40,7 @@ function GradeBar({ value, max, color }: { value: number; max: number; color: st
   );
 }
 
-export default function HeroStatusCard({ data, stationName, regionName }: Props) {
+export default function HeroStatusCard({ data, stationName, regionName, searchBar }: Props) {
   const khaiInfo = getGradeInfo(data?.khaiGrade ?? "0");
   const pm10Info = getGradeInfo(data?.pm10Grade1h || data?.pm10Grade || "0");
   const pm25Info = getGradeInfo(data?.pm25Grade1h || data?.pm25Grade || "0");
@@ -66,7 +68,9 @@ export default function HeroStatusCard({ data, stationName, regionName }: Props)
         {/* 상단 위치 & 시간 */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <p className="text-white/70 text-sm font-medium flex items-center gap-1"><IconMapPin className="w-3.5 h-3.5" /> {regionName}</p>
+            {searchBar ?? (
+              <p className="text-white/70 text-sm font-medium flex items-center gap-1"><IconMapPin className="w-3.5 h-3.5" /> {regionName}</p>
+            )}
             <p className="text-white/50 text-xs mt-0.5">{stationName} 측정소 기준 · 인근 대표값</p>
           </div>
           {data?.dataTime && (
