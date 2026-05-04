@@ -136,6 +136,7 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
                 data={latest}
                 stationName={station.stationName}
                 regionName={station.regionName}
+                weather={weather}
                 searchBar={
                   <StationSearchBar
                     currentRegionName={station.regionName}

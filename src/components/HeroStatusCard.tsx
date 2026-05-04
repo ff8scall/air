@@ -1,6 +1,8 @@
 "use client";
 import type { AirQualityItem } from "@/types/air-quality";
 import type React from "react";
+import type { CurrentWeather } from "@/lib/weather";
+import { getWeatherIcon } from "@/lib/weather";
 import { getGradeInfo } from "@/lib/scoring";
 import { IconWind, IconMask, IconBan, IconMapPin, IconClock } from "@/components/icons";
 
@@ -9,6 +11,7 @@ interface Props {
   stationName: string;
   regionName: string;
   searchBar?: React.ReactNode;
+  weather?: CurrentWeather | null;
 }
 
 const GRADE_DESC: Record<string, string> = {
@@ -40,7 +43,7 @@ function GradeBar({ value, max, color }: { value: number; max: number; color: st
   );
 }
 
-export default function HeroStatusCard({ data, stationName, regionName, searchBar }: Props) {
+export default function HeroStatusCard({ data, stationName, regionName, searchBar, weather }: Props) {
   const khaiInfo = getGradeInfo(data?.khaiGrade ?? "0");
   const pm10Info = getGradeInfo(data?.pm10Grade1h || data?.pm10Grade || "0");
   const pm25Info = getGradeInfo(data?.pm25Grade1h || data?.pm25Grade || "0");
@@ -91,12 +94,20 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-1">
             <GradeIcon grade={data?.khaiGrade ?? "0"} />
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-white/70 text-sm">지금 바깥 공기는</p>
               <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-none">
                 {khaiInfo.label !== "알 수 없음" ? khaiInfo.label : "데이터 없음"}
               </h1>
             </div>
+            {/* 날씨 pill */}
+            {weather && (
+              <div className="shrink-0 flex flex-col items-end gap-1">
+                <span className="text-2xl leading-none">{getWeatherIcon(weather.weathercode)}</span>
+                <span className="text-white font-black text-lg leading-none">{weather.temperature}°</span>
+                <span className="text-white/60 text-xs leading-none">습도 {weather.humidity}%</span>
+              </div>
+            )}
           </div>
           <p className="text-white/80 text-base font-medium mt-2 ml-1">{GRADE_DESC[data?.khaiGrade ?? ""] ?? ""}</p>
         </div>
