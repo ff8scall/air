@@ -11,11 +11,9 @@
 
 ## 2. 측정소 ↔ 좌표 매핑 (station-mapping.ts)
 
-- 에어코리아 API는 좌표를 제공하지 않음 → `STATION_COORDS` 수동 테이블로 관리
-- 매핑 우선순위: `STATION_COORDS[stationName]` → `SIDO_CENTERS[sidoName]` → null (제외)
-- 좌표 없는 측정소는 `buildMapMarkers()`에서 필터링됨
-- 현재 약 170+ 측정소 좌표 등록 (서울 전체 + 수도권 주요 동/도로명 포함)
-- `SIDO_CENTERS` fallback 시 `Math.random() * 0.8` 오프셋으로 겹침 방지
+- **우선순위**: `STATION_COORDS_API` (672개, 에어코리아 getMsrstnList dmX/dmY) → `STATION_COORDS` (수동) → null 필터
+- `SIDO_CENTERS` fallback **폐기** — 제주·강원 측정소가 바다에 찍히는 문제 근본 해결
+- `station-coords-api.ts`: PowerShell로 전국 17개 시도 순회 수집 → 중복 제거 → 정적 TS 파일로 저장
 
 ## 3. 등급 판정 (scoring.ts::getGradeInfo)
 
@@ -99,3 +97,42 @@ calcLaundryScore(pm10, pm25): 동일 공식
 - **실제 측정소**: `송파구` (에어코리아 구 단위 측정소)
 - UI에 항상 "송파구 측정소 기준 · 인근 대표값" 표시로 혼선 방지
 - 동 단위 측정소는 에어코리아에 없음 — 구 단위가 최소 단위
+
+## 11. 다크모드 구현 (2026-05-04)
+
+- **방식**: Tailwind v4 `@variant dark (&:where(.dark, .dark *))` — class 기반
+- **토글**: `ThemeProvider`가 `html` 태그에 `.dark` 클래스 토글
+- **저장**: `localStorage["air_theme"]` → `"light"` | `"dark"` | `"system"`
+- **초기값**: `"system"` → `prefers-color-scheme` 미디어 쿼리 자동 감지
+- **UI**: 헤더 내 `ThemeToggle` 버튼 (달/해 아이콘 전환)
+- **컬러 전략**:
+  - HeroStatusCard 그라데이션: 라이트 `sky-500→blue-600`, 다크 `sky-700→blue-900` (등급별)
+  - ActionAdviceCard 배경: `from-sky-50 dark:from-sky-950` 계열
+  - 카드 배경: `bg-white dark:bg-gray-900`
+  - 페이지 배경: `bg-slate-50 dark:bg-gray-950`
+
+## 12. 관심 지역 선택 기능 (2026-05-04)
+
+### API: /api/resolve-station
+- `?umdName=오금동` → `fetchTmCoord(umdName)` → TM좌표 → `fetchNearbyStations()` → 1순위 측정소
+- `?lat=&lng=` → proj4 WGS84→TM 변환 → `fetchNearbyStations()` → 1순위 측정소
+- 반환: `{ stationName, regionName, tmX, tmY }`
+
+### Hook: useUserStation
+- `localStorage["air_user_station"]` JSON 저장
+- 반환: `{ station, setStation, clearStation, loaded }`
+- `loaded` 플래그: hydration 전 기본값 노출 방지
+
+### DashboardShell 클라이언트 흐름
+- `loaded && station ≠ DEFAULT` → `/api/air-quality?station=` 재fetch
+- `station` 변경 시 `useEffect` 트리거
+
+## 13. StationSearchBar UX (2026-05-04)
+
+- **항상 노출** 인라인 방식 (드롭다운 폐기)
+- Hero 카드 하단 `border-t border-white/20` 구분선 아래 배치
+- 구성: `[ 🔍 동 이름으로 검색 ··· ] [GPS] [✕]`
+  - 검색 입력창: `bg-white/20` 반투명, `focus-within:bg-white/30`
+  - GPS 버튼: `w-9 h-9` 아이콘 버튼
+  - 초기화(✕): `onClear()` → `useUserStation.clearStation()`
+- 에러: Hero 카드 안 `bg-black/20` 반투명 텍스트로 표시

@@ -48,6 +48,15 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
   const pm10Val = data?.pm10Value && data.pm10Value !== "-" ? Number(data.pm10Value) : null;
   const pm25Val = data?.pm25Value && data.pm25Value !== "-" ? Number(data.pm25Value) : null;
 
+  const khaiGradeNum = parseInt(data?.khaiGrade ?? "0");
+  const pm10GradeNum = parseInt(data?.pm10Grade1h || data?.pm10Grade || "0");
+  const pm25GradeNum = parseInt(data?.pm25Grade1h || data?.pm25Grade || "0");
+  const bestPmGrade = Math.min(pm10GradeNum || 9, pm25GradeNum || 9);
+  const showKhaiNote =
+    khaiGradeNum > 0 &&
+    bestPmGrade > 0 &&
+    bestPmGrade < khaiGradeNum;
+
   const bgGradient: Record<string, string> = {
     "좋음":       "from-sky-500 to-blue-600 dark:from-sky-700 dark:to-blue-900",
     "보통":       "from-emerald-600 to-teal-700 dark:from-emerald-700 dark:to-green-900",
@@ -124,6 +133,16 @@ export default function HeroStatusCard({ data, stationName, regionName, searchBa
             )}
           </div>
         </div>
+
+        {/* KHai/PM 혼선 안내 */}
+        {showKhaiNote && (
+          <div className="mb-3 bg-white/10 rounded-xl px-3 py-2 flex items-start gap-2">
+            <span className="text-white/60 text-xs mt-0.5 shrink-0">ℹ️</span>
+            <p className="text-white/70 text-xs leading-relaxed">
+              통합지수(KHai)는 오존·이산화질소 등을 포함해 산출돼 미세먼지 단독 등급보다 높을 수 있어요.
+            </p>
+          </div>
+        )}
 
         {/* 데이터 없음 안내 */}
         {!data && (

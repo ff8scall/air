@@ -6,7 +6,7 @@ import type { AirQualityItem } from "@/types/air-quality";
 import type { MapMarkerData } from "@/types/station";
 import { calcVentilationScore, calcLaundryScore, parseValue } from "@/lib/scoring";
 import { getVentilationAdvice, getLaundryAdvice, getNeighborhoodInsight } from "@/lib/advisor";
-import { buildMapMarkers } from "@/lib/station-mapping";
+import { buildMapMarkers, getStationCoords } from "@/lib/station-mapping";
 import HeroStatusCard from "@/components/HeroStatusCard";
 import ActionAdviceCard from "@/components/ActionAdviceCard";
 import ScoreCards from "@/components/ScoreCards";
@@ -70,7 +70,13 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
   const laundry = calcLaundryScore(pm10Safe, pm25Safe);
   const advice = getVentilationAdvice(pm10Safe, pm25Safe);
   const laundryAdvice = getLaundryAdvice(pm10Safe, pm25Safe);
-  const neighborhood = getNeighborhoodInsight(station.stationName, 37.502, 127.124, markers);
+
+  const DEFAULT_CENTER: [number, number] = [37.502, 127.124];
+  const stationCoords = getStationCoords(station.stationName);
+  const mapCenter: [number, number] = stationCoords ?? DEFAULT_CENTER;
+  const [centerLat, centerLng] = mapCenter;
+
+  const neighborhood = getNeighborhoodInsight(station.stationName, centerLat, centerLng, markers);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-gray-950">
@@ -168,7 +174,7 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
               <span className="text-xs text-gray-300 dark:text-gray-600">마커 클릭 시 상세 정보</span>
             </div>
             <div className="h-[400px] lg:h-[calc(100vh-84px)]">
-              <DynamicMap markers={markers} center={[37.502, 127.124]} zoom={13} />
+              <DynamicMap markers={markers} center={mapCenter} zoom={13} />
             </div>
           </section>
         </div>

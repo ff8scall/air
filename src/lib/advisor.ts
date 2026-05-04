@@ -7,6 +7,7 @@ export interface VentilationAdvice {
   minutes?: number;
   color: string;
   bgGradient: string;
+  factors: string[];
 }
 
 export interface NeighborhoodInsight {
@@ -45,6 +46,7 @@ export function getVentilationAdvice(pm10: number, pm25: number): VentilationAdv
       subtext: "잠시 후 다시 확인해주세요.",
       color: "text-gray-500",
       bgGradient: "from-gray-400 to-slate-500",
+      factors: [],
     };
   }
   if (pm10 <= 30 && pm25 <= 15) {
@@ -55,6 +57,7 @@ export function getVentilationAdvice(pm10: number, pm25: number): VentilationAdv
       minutes: 20,
       color: "text-sky-600",
       bgGradient: "from-sky-400 to-blue-500",
+      factors: [`PM10 ${pm10}㎍/㎥ 좋음`, `PM2.5 ${pm25}㎍/㎥ 좋음`],
     };
   }
   if (pm10 <= 50 && pm25 <= 25) {
@@ -65,6 +68,7 @@ export function getVentilationAdvice(pm10: number, pm25: number): VentilationAdv
       minutes: 10,
       color: "text-emerald-600",
       bgGradient: "from-emerald-400 to-green-500",
+      factors: [`PM10 ${pm10}㎍/㎥ 보통`, `PM2.5 ${pm25}㎍/㎥ 보통`],
     };
   }
   if (pm10 <= 80 && pm25 <= 35) {
@@ -75,6 +79,10 @@ export function getVentilationAdvice(pm10: number, pm25: number): VentilationAdv
       minutes: 5,
       color: "text-yellow-600",
       bgGradient: "from-yellow-400 to-amber-500",
+      factors: [
+        `PM10 ${pm10}㎍/㎥ ${pm10 > 50 ? "나쁨" : "보통"}`,
+        `PM2.5 ${pm25}㎍/㎥ ${pm25 > 25 ? "나쁨" : "보통"}`,
+      ],
     };
   }
   if (pm10 <= 150 && pm25 <= 75) {
@@ -84,6 +92,10 @@ export function getVentilationAdvice(pm10: number, pm25: number): VentilationAdv
       subtext: "미세먼지가 높아요. 30분 뒤 다시 확인하세요.",
       color: "text-orange-600",
       bgGradient: "from-orange-400 to-amber-500",
+      factors: [
+        `PM10 ${pm10}㎍/㎥ 나쁨`,
+        `PM2.5 ${pm25}㎍/㎥ 나쁨`,
+      ],
     };
   }
   return {
@@ -92,6 +104,10 @@ export function getVentilationAdvice(pm10: number, pm25: number): VentilationAdv
     subtext: "미세먼지가 매우 나쁩니다. 외출 시 마스크를 착용하세요.",
     color: "text-red-600",
     bgGradient: "from-red-500 to-rose-600",
+    factors: [
+      `PM10 ${pm10}㎍/㎥ 매우나쁨`,
+      `PM2.5 ${pm25}㎍/㎥ 매우나쁨`,
+    ],
   };
 }
 

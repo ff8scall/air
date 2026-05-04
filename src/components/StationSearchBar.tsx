@@ -40,6 +40,12 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
   const [loading, setLoading] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  function showSuccess(msg: string) {
+    setSuccess(msg);
+    setTimeout(() => setSuccess(null), 3000);
+  }
 
   async function search(umdName: string) {
     if (!umdName.trim()) return;
@@ -51,6 +57,7 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
       if (!res.ok) { setError(data.error ?? "검색 실패"); return; }
       onStation({ stationName: data.stationName, regionName: data.regionName, updatedAt: Date.now() });
       setQuery("");
+      showSuccess(`${data.regionName} · ${data.stationName} 측정소로 변경됐어요`);
     } catch {
       setError("네트워크 오류가 발생했습니다.");
     } finally {
@@ -70,6 +77,7 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
           const data = await res.json();
           if (!res.ok) { setError(data.error ?? "위치 기반 측정소를 찾지 못했습니다."); return; }
           onStation({ stationName: data.stationName, regionName: data.regionName, updatedAt: Date.now() });
+          showSuccess(`현재 위치 · ${data.stationName} 측정소로 변경됐어요`);
         } catch {
           setError("위치 정보 처리 중 오류가 발생했습니다.");
         } finally {
@@ -140,6 +148,13 @@ export default function StationSearchBar({ currentRegionName, onStation, onClear
       {/* 에러 */}
       {error && (
         <p className="mt-2 text-xs text-white/90 bg-black/20 rounded-lg px-3 py-1.5">{error}</p>
+      )}
+
+      {/* 성공 */}
+      {success && (
+        <p className="mt-2 text-xs text-white/90 bg-white/20 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+          <span>✓</span>{success}
+        </p>
       )}
     </div>
   );

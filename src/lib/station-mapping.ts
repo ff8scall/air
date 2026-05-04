@@ -198,6 +198,10 @@ const STATION_COORDS: Record<string, [number, number]> = {
   양평: [37.4919, 127.4874],
 };
 
+export function getStationCoords(stationName: string): [number, number] | null {
+  return STATION_COORDS_API[stationName] ?? STATION_COORDS[stationName] ?? null;
+}
+
 export function buildMapMarkers(items: SidoAirItem[]): MapMarkerData[] {
   return items
     .map((item) => {

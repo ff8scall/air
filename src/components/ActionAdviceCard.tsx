@@ -15,24 +15,24 @@ function ActionIcon({ action, className }: { action: VentilationAdvice["action"]
 }
 
 const ACTION_BG: Record<string, string> = {
-  open: "from-sky-50 to-blue-50 border-sky-100",
-  brief: "from-emerald-50 to-green-50 border-emerald-100",
-  wait: "from-amber-50 to-yellow-50 border-amber-100",
-  close: "from-red-50 to-rose-50 border-red-100",
+  open:  "from-sky-50 to-blue-50 border-sky-100 dark:from-sky-950 dark:to-blue-950 dark:border-sky-800",
+  brief: "from-emerald-50 to-green-50 border-emerald-100 dark:from-emerald-950 dark:to-green-950 dark:border-emerald-800",
+  wait:  "from-amber-50 to-yellow-50 border-amber-100 dark:from-amber-950 dark:to-yellow-950 dark:border-amber-800",
+  close: "from-red-50 to-rose-50 border-red-100 dark:from-red-950 dark:to-rose-950 dark:border-red-800",
 };
 
 const ACTION_ICON_COLOR: Record<string, string> = {
-  open: "text-sky-500",
-  brief: "text-emerald-500",
-  wait: "text-amber-500",
-  close: "text-red-500",
+  open:  "text-sky-500 dark:text-sky-400",
+  brief: "text-emerald-500 dark:text-emerald-400",
+  wait:  "text-amber-500 dark:text-amber-400",
+  close: "text-red-500 dark:text-red-400",
 };
 
 const ACTION_BADGE: Record<string, { label: string; bg: string; text: string }> = {
-  open: { label: "환기 가능", bg: "bg-sky-100", text: "text-sky-700" },
-  brief: { label: "짧게 환기", bg: "bg-emerald-100", text: "text-emerald-700" },
-  wait: { label: "환기 대기", bg: "bg-amber-100", text: "text-amber-700" },
-  close: { label: "환기 금지", bg: "bg-red-100", text: "text-red-700" },
+  open:  { label: "환기 가능", bg: "bg-sky-100 dark:bg-sky-900",     text: "text-sky-700 dark:text-sky-300" },
+  brief: { label: "짧게 환기", bg: "bg-emerald-100 dark:bg-emerald-900", text: "text-emerald-700 dark:text-emerald-300" },
+  wait:  { label: "환기 대기", bg: "bg-amber-100 dark:bg-amber-900", text: "text-amber-700 dark:text-amber-300" },
+  close: { label: "환기 금지", bg: "bg-red-100 dark:bg-red-900",     text: "text-red-700 dark:text-red-300" },
 };
 
 export default function ActionAdviceCard({ advice, laundryAdvice }: Props) {
@@ -70,9 +70,23 @@ export default function ActionAdviceCard({ advice, laundryAdvice }: Props) {
         </div>
       )}
 
+      {/* 근거 칩 */}
+      {advice.factors.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {advice.factors.map((f) => (
+            <span
+              key={f}
+              className="text-xs font-semibold px-2.5 py-1 rounded-full bg-black/8 dark:bg-white/10 text-gray-600 dark:text-gray-300"
+            >
+              {f}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* 빨래 조언 */}
       <div className="mt-3 bg-white/60 dark:bg-white/10 rounded-2xl px-4 py-2.5 flex items-center gap-2">
-        <span className="text-sm text-gray-400">�</span>
+        <span className="text-sm text-gray-400">🧺</span>
         <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">{laundryAdvice}</p>
       </div>
     </div>
