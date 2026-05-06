@@ -10,7 +10,7 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "환기 미세먼지 대시보드";
-const APP_URL = "https://air.antigravity.kr";
+const APP_URL = "https://air.lego-sia.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -84,7 +84,7 @@ export default function RootLayout({
               author: {
                 "@type": "Organization",
                 name: "Antigravity",
-                url: "https://antigravity.kr"
+                url: "https://lego-sia.com"
               }
             },
             {

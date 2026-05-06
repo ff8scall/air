@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://air.antigravity.kr/sitemap.xml",
+    sitemap: "https://air.lego-sia.com/sitemap.xml",
   };
 }
