@@ -8,45 +8,51 @@ c:\AI\Antigravity\Air\
 ├── src/
 │   ├── app/
 │   │   ├── page.tsx                  # Server Component (revalidate 1800) → DashboardShell에 초기 데이터 전달
-│   │   ├── layout.tsx                # 루트 레이아웃 + ThemeProvider 래핑 + PWA 메타
+│   │   ├── [region]/
+│   │   │   └── page.tsx              # [NEW] 지역별 동적 페이지 (SSG: generateStaticParams)
+│   │   ├── layout.tsx                # 루트 레이아웃 + ThemeProvider + PWA/SEO 메타 (Naver/Bing 인증)
 │   │   ├── globals.css               # Tailwind + @variant dark + Leaflet z-index 보정
+│   │   ├── robots.ts                 # [NEW] 동적 robots.txt 생성
+│   │   ├── sitemap.ts                # [NEW] 지역별 URL 포함 동적 sitemap.xml 생성
 │   │   └── api/
-│   │       ├── air-quality/route.ts  # GET /api/air-quality?station=
-│   │       ├── sido/route.ts         # GET /api/sido?sido=
-│   │       ├── nearby/route.ts       # GET /api/nearby
-│   │       ├── resolve-station/route.ts # GET ?umdName= 또는 ?lat=&lng= → { stationName, regionName }
-│   │       └── weather/route.ts         # GET ?lat=&lng= → Open-Meteo 현재 날씨
+│   │       ├── air-quality/route.ts
+│   │       ├── sido/route.ts
+│   │       ├── nearby/route.ts
+│   │       ├── resolve-station/route.ts
+│   │       └── weather/route.ts
 │   ├── components/
-│   │   ├── DashboardShell.tsx        # [Client] 지역 상태 관리 + 전체 레이아웃 렌더링
-│   │   ├── HeroStatusCard.tsx        # 등급별 그라데이션 Hero + 인라인 검색바 하단 배치
-│   │   ├── StationSearchBar.tsx      # [Client] 항상 노출 인라인 검색바 (동 이름 + GPS + 초기화)
-│   │   ├── ThemeProvider.tsx         # [Client] html.dark 클래스 토글 + localStorage 저장
-│   │   ├── ThemeToggle.tsx           # [Client] 헤더 내 달/해 토글 버튼
-│   │   ├── ActionAdviceCard.tsx      # 창문 환기 타이밍 행동 추천 카드
-│   │   ├── NeighborhoodCompareCard.tsx # 주변 측정소 비교 카드 (10km 반경)
-│   │   ├── ScoreCards.tsx            # 환기/빨래 지수 링 카드
-│   │   ├── AirQualityMap.tsx         # Leaflet 지도 + 말풍선형 SVG 마커
-│   │   ├── DynamicMap.tsx            # AirQualityMap ssr:false wrapper
-│   │   ├── DynamicNotification.tsx   # NotificationSetup ssr:false wrapper
-│   │   ├── NotificationSetup.tsx     # 알림 권한 요청 버튼
-│   │   ├── WeatherAdviceCard.tsx     # [NEW] 날씨 요약 + 환기/빨래/외출 보정 노트
-│   │   └── icons.tsx                 # 전용 SVG 아이콘 + gradeMarkerSvg()
+│   │   ├── DashboardShell.tsx        # [Client] 지역 상태 관리 + 전체 레이아웃 렌더링 (initialStation 지원)
+│   │   ├── HeroStatusCard.tsx        # 등급별 그라데이션 Hero
+│   │   ├── StationSearchBar.tsx      # [Client] 인라인 검색바
+│   │   ├── RegionalLinks.tsx         # [NEW] 하단 지역별 바로가기 링크 (Silo 구조)
+│   │   ├── ThemeProvider.tsx
+│   │   ├── ThemeToggle.tsx
+│   │   ├── ActionAdviceCard.tsx
+│   │   ├── NeighborhoodCompareCard.tsx
+│   │   ├── ScoreCards.tsx
+│   │   ├── AirQualityMap.tsx
+│   │   ├── DynamicMap.tsx
+│   │   ├── DynamicNotification.tsx
+│   │   ├── NotificationSetup.tsx
+│   │   ├── WeatherAdviceCard.tsx
+│   │   └── icons.tsx
 │   ├── hooks/
-│   │   └── useUserStation.ts         # [Client] localStorage 기반 선택 측정소 관리
+│   │   └── useUserStation.ts
 │   ├── lib/
-│   │   ├── airkorea.ts               # 에어코리아 API 클라이언트 + fetchAllSidoRealtime()
-│   │   ├── scoring.ts                # 환기/빨래 점수 계산 + getGradeInfo()
-│   │   ├── advisor.ts                # VentilationAdvice(factors[]), WeatherAdvice, getWeatherAdvice()
-│   │   ├── weather.ts                # [NEW] Open-Meteo fetch + WMO 코드 변환
-│   │   ├── station-mapping.ts        # buildMapMarkers() + getStationCoords()
-│   │   └── station-coords-api.ts     # 에어코리아 getMsrstnList 기반 전국 672개 측정소 좌표
+│   │   ├── airkorea.ts
+│   │   ├── scoring.ts
+│   │   ├── advisor.ts
+│   │   ├── weather.ts
+│   │   ├── regions.ts                # [NEW] 지역명-슬러그-측정소 매핑 데이터
+│   │   ├── station-mapping.ts
+│   │   └── station-coords-api.ts
 │   └── types/
 │       ├── air-quality.ts
 │       └── station.ts
 ├── public/
 │   ├── manifest.webmanifest
 │   └── sw-custom.js
-├── .env.local                        # AIRKOREA_SERVICE_KEY, DEFAULT_STATION, DEFAULT_REGION
+├── .env.local
 └── next.config.ts
 ```
 

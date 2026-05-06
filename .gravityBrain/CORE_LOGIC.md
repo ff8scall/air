@@ -1,6 +1,6 @@
 # CORE LOGIC — 환기 미세먼지 대시보드
 
-> 마지막 갱신: 2026-05-04 (4차)
+> 마지막 갱신: 2026-05-06 (4차)
 
 ## 1. API 캐싱 전략
 
@@ -174,3 +174,22 @@ calcLaundryScore(pm10, pm25): 동일 공식
 
 - **원인**: `SeoJsonLd` Server Component이 `<head>` 내 `<script dangerouslySetInnerHTML>`을 돌려줌 → `ThemeProvider` 클라이언트 hydration 시 `type=null` / `__html=""` 불일치
 - **해결**: `SeoJsonLd.tsx` 컴포넌트 제거, `layout.tsx`의 `RootLayout` 함수 `<head>` 내 정적 `<script>` 직접 인라인
+
+## 17. 지역별 SEO 확장 전략 (Dynamic Routing)
+
+### 17.1 동적 라우팅 구조
+- `src/app/[region]/page.tsx` 경로를 통해 특정 지역의 전용 페이지를 제공합니다.
+- `src/lib/regions.ts`에서 URL 슬러그(`seoul`, `songpa`)와 실제 에어코리아 측정소 이름(`종로구`, `송파구`)을 매핑합니다.
+- `generateStaticParams`를 활용하여 주요 시도(17개) 및 대도시(7개+)를 빌드 시점에 정적 HTML로 생성(SSG)하여 초기 로딩 속도와 크롤링 효율을 극대화합니다.
+
+### 17.2 메타데이터 동적화
+- `generateMetadata` 함수를 사용하여 각 지역에 맞는 타이틀과 설명을 생성합니다.
+- 예: `[지역명] 실시간 미세먼지 현황 및 환기 지수`
+- `alternates.canonical` 설정을 통해 중복 콘텐츠 이슈를 방지하고 검색 엔진 점수를 집중시킵니다.
+
+### 17.3 수집 최적화 (Silo 구조)
+- **Sitemap**: `sitemap.ts`에서 `ALL_REGIONS` 목록을 순회하여 모든 지역별 URL을 포함시킵니다.
+- **Internal Links**: `RegionalLinks` 컴포넌트를 통해 모든 페이지 하단에 다른 지역으로의 링크를 배치하여 검색 엔진 봇의 크롤링 경로를 확보합니다.
+- **JSON-LD Dataset**: 에어코리아 데이터를 활용함을 명시하여 검색 결과에서 데이터셋 정보를 풍부하게 제공합니다.
+- **Verification**: 네이버(`naver-site-verification`) 및 빙(`msvalidate.01`) 사이트 소유권 인증 메타 태그를 `layout.tsx`에 통합 관리합니다.
+

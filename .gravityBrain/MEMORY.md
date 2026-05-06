@@ -32,12 +32,19 @@
 7. **fetchAllSidoRealtime** — `sidoName=전국` 500개 한계 → 17개 시도 병렬 호출로 경기도 마커 복원
 8. **SeoJsonLd hydration 오류 수정** — 컴포넌트 제거, `layout.tsx` 직접 인라인
 
-### 세션 4 — SEO 최적화 및 검색 엔진 등록 (이번)
+### 세션 4 — SEO 최적화 및 검색 엔진 등록
 1. **인증 태그 추가** — 네이버(`naver-site-verification`), 빙(`msvalidate.01`) 소유권 확인 태그 반영
 2. **수집 최적화** — `robots.ts`, `sitemap.ts` 동적 생성 추가 (빌드 시 생성 확인)
 3. **구조화 데이터 강화** — `WebApplication` 및 `Dataset` (에어코리아 출처) JSON-LD 추가
 4. **메타데이터 보완** — `canonical` URL, OG 이미지 경로 및 설명 보완
-5. **빌드 검증** — `npm run build` 통과 및 정적 라우트 생성 완료
+
+### 세션 5 — 지역별 동적 라우팅 (Dynamic Routing) 도입 (이번)
+1. **라우팅 확장** — `src/app/[region]/page.tsx` 생성 및 35개 정적 페이지 빌드(SSG) 환경 구축
+2. **지역 매핑** — `src/lib/regions.ts`를 통해 URL 슬러그와 측정소 간 매핑 로직 구현
+3. **메타데이터 동적화** — `generateMetadata`로 지역별 맞춤형 타이틀 및 설명 자동 생성
+4. **내부 링크 보완** — `RegionalLinks` 컴포넌트로 사이트 내 Silo 구조 형성 (SEO 강화)
+5. **빌드 검증** — 35개 경로 정상 빌드 및 `sitemap.xml` 내 지역별 URL 포함 확인
+
 
 
 ## 알려진 한계 / 잠재적 TODO
