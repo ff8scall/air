@@ -1,6 +1,6 @@
 # MEMORY — 다음 세션을 위한 맥락
 
-> 마지막 갱신: 2026-05-04 (4차)
+> 마지막 갱신: 2026-05-06 (4차)
 
 ## 현재 상태 요약
 
@@ -22,7 +22,7 @@
 3. **지도 좌표 정확화** — `station-coords-api.ts` (에어코리아 API 전국 672개), `SIDO_CENTERS` fallback 폐기
 4. **검색 UX 개선** — 드롭다운 → Hero 카드 하단 항상 노출 인라인 검색바
 
-### 세션 3 — Phase 1A + Phase 2 (이번)
+### 세션 3 — Phase 1A + Phase 2
 1. **지도 center 연동** — `getStationCoords()` + `DashboardShell` center/neighborhood 연동 완료
 2. **추천 근거 칩** — `VentilationAdvice.factors[]` + `ActionAdviceCard` 칩 표시
 3. **KHai/PM 혼선 안내** — KHai > PM 단독등급일 때 HeroStatusCard 인라인 안내
@@ -31,6 +31,14 @@
 6. **HeroStatusCard 날씨 pill** — 기온/날씨이모지/습도 우측 인라인 표시
 7. **fetchAllSidoRealtime** — `sidoName=전국` 500개 한계 → 17개 시도 병렬 호출로 경기도 마커 복원
 8. **SeoJsonLd hydration 오류 수정** — 컴포넌트 제거, `layout.tsx` 직접 인라인
+
+### 세션 4 — SEO 최적화 및 검색 엔진 등록 (이번)
+1. **인증 태그 추가** — 네이버(`naver-site-verification`), 빙(`msvalidate.01`) 소유권 확인 태그 반영
+2. **수집 최적화** — `robots.ts`, `sitemap.ts` 동적 생성 추가 (빌드 시 생성 확인)
+3. **구조화 데이터 강화** — `WebApplication` 및 `Dataset` (에어코리아 출처) JSON-LD 추가
+4. **메타데이터 보완** — `canonical` URL, OG 이미지 경로 및 설명 보완
+5. **빌드 검증** — `npm run build` 통과 및 정적 라우트 생성 완료
+
 
 ## 알려진 한계 / 잠재적 TODO
 
