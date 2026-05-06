@@ -15,6 +15,7 @@ import ScoreCards from "@/components/ScoreCards";
 import NeighborhoodCompareCard from "@/components/NeighborhoodCompareCard";
 import WeatherAdviceCard from "@/components/WeatherAdviceCard";
 import StationSearchBar from "@/components/StationSearchBar";
+import RegionalLinks from "@/components/RegionalLinks";
 import DynamicMap from "@/components/DynamicMap";
 import DynamicNotification from "@/components/DynamicNotification";
 import { IconWind } from "@/components/icons";
@@ -31,15 +32,36 @@ interface Props {
   initialLatest: AirQualityItem | null;
   initialMarkers: MapMarkerData[];
   initialError: string | null;
+  initialStationName?: string;
+  initialRegionName?: string;
 }
 
-export default function DashboardShell({ initialLatest, initialMarkers, initialError }: Props) {
+export default function DashboardShell({ 
+  initialLatest, 
+  initialMarkers, 
+  initialError,
+  initialStationName,
+  initialRegionName
+}: Props) {
   const { station, setStation, clearStation, loaded } = useUserStation();
   const [latest, setLatest] = useState<AirQualityItem | null>(initialLatest);
   const [markers] = useState<MapMarkerData[]>(initialMarkers);
   const [error, setError] = useState<string | null>(initialError);
   const [fetching, setFetching] = useState(false);
   const [weather, setWeather] = useState<CurrentWeather | null>(null);
+
+  // URL 파라미터나 초기 진입 지역이 있을 경우 동기화
+  useEffect(() => {
+    if (loaded && initialStationName && initialRegionName) {
+      if (station.stationName !== initialStationName) {
+        setStation({ 
+          stationName: initialStationName, 
+          regionName: initialRegionName,
+          updatedAt: Date.now()
+        });
+      }
+    }
+  }, [loaded, initialStationName, initialRegionName, setStation, station.stationName]);
 
   const fetchWeather = useCallback(async (lat: number, lng: number) => {
     try {
@@ -167,6 +189,11 @@ export default function DashboardShell({ initialLatest, initialMarkers, initialE
             {/* 동네 비교 */}
             <section aria-label="주변 동네 공기질 비교">
               <NeighborhoodCompareCard result={neighborhood} />
+            </section>
+
+            {/* 지역별 링크 */}
+            <section aria-label="지역별 바로가기">
+              <RegionalLinks />
             </section>
 
             {/* 등급 기준표 */}

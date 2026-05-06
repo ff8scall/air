@@ -27,6 +27,8 @@ export default async function HomePage() {
       initialLatest={latest}
       initialMarkers={markers}
       initialError={error}
+      initialStationName={DEFAULT_STATION}
+      initialRegionName={process.env.NEXT_PUBLIC_DEFAULT_REGION ?? "송파구 오금동"}
     />
   );
 }
